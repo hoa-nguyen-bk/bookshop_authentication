@@ -19,4 +19,6 @@ spring:
     url: jdbc:mysql://localhost:3307/bookstore
     username: root
     password: admin123
+jwt:
+    secret: dcnNZDycP4dGEJvBO40ibxjap207BpXKr8vwlNP2pl0=
 
