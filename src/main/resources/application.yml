@@ -1,3 +1,5 @@
+
+
 spring:
   application:
     name: authentication-service
@@ -21,4 +23,5 @@ spring:
     password: admin123
 jwt:
     secret: dcnNZDycP4dGEJvBO40ibxjap207BpXKr8vwlNP2pl0=
-
+server:
+  port: 8081

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.crypto.SecretKey;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/authen")
 public class AuthenticationController {
 
     @Autowired
