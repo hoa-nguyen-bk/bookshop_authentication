@@ -25,3 +25,12 @@ jwt:
     secret: dcnNZDycP4dGEJvBO40ibxjap207BpXKr8vwlNP2pl0=
 server:
   port: 8081
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8086/eureka
