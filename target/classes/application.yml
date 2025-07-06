@@ -2,7 +2,7 @@
 
 spring:
   application:
-    name: authentication-service
+    name: authentication_service
 #  datasource:
 #    hikari:
 #      jdbc-url: jdbc:mysql://localhost:3307/bookstore
@@ -33,4 +33,4 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8086/eureka
+      defaultZone: http://localhost:8761/eureka

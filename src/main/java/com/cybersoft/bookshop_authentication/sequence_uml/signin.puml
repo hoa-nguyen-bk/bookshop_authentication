@@ -1,0 +1,23 @@
+@startuml
+actor "User" as user
+participant "Mobile/Web app" as app
+participant "Authentication Service" as authService
+participant "MySQL DB" as DB
+participant "Redis Cache" as cache
+participant "Log File" as log
+
+user -> app : Enter credentials
+app -> authService : Send credentials for auth call/ sign-in
+authService -> DB : find user by email
+DB --> authService : Return user data
+authService -> authService : Verify password
+alt Password matches
+    authService -> app : Return JWT token
+    app -> app : Store JWT token in local storage
+    app -> user : Return success message ("Sign-in successful")
+else Password does not match
+    authService -> app : Return error message ("Invalid credentials") (401)
+    app -> user : Show error message ("Invalid credentials") (401)
+end
+
+@enduml
