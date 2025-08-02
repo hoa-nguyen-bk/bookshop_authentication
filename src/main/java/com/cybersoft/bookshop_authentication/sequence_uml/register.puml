@@ -1,0 +1,24 @@
+@startuml
+actor "User" as user
+participant "Mobile/Web App" as app
+participant "Authentication Service" as authenSerice
+participant "Kafka-Topic-Email" as kafka
+participant "MySQL DB" as DB
+
+user -> app : Request to send email
+app -> authenSerice : Call /register with email data
+authenSerice -> DB : verify email exists
+DB --> authenSerice : Return user data
+alt Email exists
+    authenSerice -> app : Return error message ("Email already exists") (400)
+    app -> user : Show error message ("Email already exists")
+else Email does not exist
+    authenSerice -> authenSerice : Generate random password
+    authenSerice -> kafka : Send email with random password
+    authenSerice -> DB : Save random password + email
+    authenSerice -> app : Return success message
+    app -> user : Show success message
+end
+
+
+@endumle

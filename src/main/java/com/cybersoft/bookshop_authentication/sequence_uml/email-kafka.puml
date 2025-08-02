@@ -1,0 +1,13 @@
+@startuml
+
+participant "Kafka-Topic-Email" as kaffa
+participant "Consumer-Email" as consumer
+participant "Server-Email" as gmail
+participant "MySQL DB" as DB
+
+consumer -> kaffa : Listen for email events
+kaffa -> consumer : Send email event with user data
+consumer -> gmail : Send email with user data
+gmail -> consumer : Email sent successfully
+consumer -> DB : Save email event log/ Save email success status
+@enduml
