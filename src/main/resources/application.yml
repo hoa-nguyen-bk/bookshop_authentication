@@ -21,6 +21,20 @@ spring:
     url: jdbc:mysql://localhost:3307/bookstore
     username: root
     password: admin123
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: student1060632fpt@gmail.com
+    password: iazwahsoqeatftrx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
+
 jwt:
     secret: dcnNZDycP4dGEJvBO40ibxjap207BpXKr8vwlNP2pl0=
 server:
@@ -34,3 +48,4 @@ eureka:
     register-with-eureka: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+

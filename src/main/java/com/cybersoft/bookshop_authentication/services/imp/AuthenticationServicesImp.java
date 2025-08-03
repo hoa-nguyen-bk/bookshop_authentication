@@ -7,18 +7,22 @@ import com.cybersoft.bookshop_authentication.exception.DataNotFound;
 import com.cybersoft.bookshop_authentication.payload.request.SignUpRequest;
 import com.cybersoft.bookshop_authentication.repository.UsersRepository;
 import com.cybersoft.bookshop_authentication.services.AuthenticationServices;
+import com.cybersoft.bookshop_authentication.services.MailSenderService;
 import com.cybersoft.bookshop_authentication.utils.CommonHelper;
 import com.cybersoft.bookshop_authentication.utils.JwtHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class AuthenticationServicesImp implements AuthenticationServices {
+
+    @Autowired
+    private MailSenderService mailSenderService;
 
     @Autowired
     private JwtHelper jwtHelper;
@@ -44,9 +48,12 @@ public class AuthenticationServicesImp implements AuthenticationServices {
 
     @Override
     public Users signUp(SignUpRequest signUpRequest) {
-        Optional<Users> existingUser = usersRepository.findByEmail(signUpRequest.getEmail());
         // email ko tìm thấy thì tạo mới
-        System.out.println(existingUser);
+        // email đã tồn tại thì trả về thông báo lỗi
+        if (usersRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new DataNotFound("Email already exists: " + signUpRequest.getEmail()+". Please try another email.");
+        }
+
         String randomPassword = CommonHelper.generateRandomPassword(8);
 
         Users newUser = new Users();
@@ -64,6 +71,7 @@ public class AuthenticationServicesImp implements AuthenticationServices {
         try {
             String jsonData = objectMapper.writeValueAsString(userDTO);
             kafkaTemplate.send("email", jsonData);
+            mailSenderService.sendEmail(newUser.getEmail(), "Welcome to Bookshop", "Your account has been created. Please change your password using the following link: <link>");
         } catch (Exception e){
             throw new RuntimeException( "Error converting UserDTO to JSON",e);
         }

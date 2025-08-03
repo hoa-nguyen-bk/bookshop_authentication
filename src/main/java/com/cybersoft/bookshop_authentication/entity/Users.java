@@ -1,9 +1,7 @@
 package com.cybersoft.bookshop_authentication.entity;
 
 import com.cybersoft.bookshop_authentication.enumable.StatusUser;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +16,7 @@ public class Users {
     @Id
     private String id;
 
+    @Enumerated(EnumType.STRING)
     private StatusUser status;
     private String email;
     private String password;
@@ -27,5 +26,8 @@ public class Users {
     @PrePersist
     public void prePersist() {
         this.id = UUID.randomUUID().toString();
+        if (this.status == null) {
+            this.status = StatusUser.ACTIVE; // default
+        }
     }
 }
