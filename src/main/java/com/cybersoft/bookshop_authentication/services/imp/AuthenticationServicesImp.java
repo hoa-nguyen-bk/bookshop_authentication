@@ -17,6 +17,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 public class AuthenticationServicesImp implements AuthenticationServices {
@@ -50,8 +52,9 @@ public class AuthenticationServicesImp implements AuthenticationServices {
     public Users signUp(SignUpRequest signUpRequest) {
         // email ko tìm thấy thì tạo mới
         // email đã tồn tại thì trả về thông báo lỗi
-        if (usersRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new DataNotFound("Email already exists: " + signUpRequest.getEmail()+". Please try another email.");
+        Optional<Users> existingUser = usersRepository.findByEmail(signUpRequest.getEmail());
+        if (existingUser.isPresent()) {
+            throw new DataNotFound("User already exists with email: " + signUpRequest.getEmail());
         }
 
         String randomPassword = CommonHelper.generateRandomPassword(8);
@@ -71,7 +74,7 @@ public class AuthenticationServicesImp implements AuthenticationServices {
         try {
             String jsonData = objectMapper.writeValueAsString(userDTO);
             kafkaTemplate.send("email", jsonData);
-            mailSenderService.sendEmail(newUser.getEmail(), "Welcome to Bookshop", "Your account has been created. Please change your password using the following link: <link>");
+//            mailSenderService.sendEmail(newUser.getEmail(), "Welcome to Bookshop", "Your account has been created. Please change your password using the following link: <link>");
         } catch (Exception e){
             throw new RuntimeException( "Error converting UserDTO to JSON",e);
         }

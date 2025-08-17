@@ -28,12 +28,14 @@ spring:
     password: iazwahsoqeatftrx
     properties:
       mail:
+        debug: true # bật chế độ debug
         smtp:
           auth: true
-          starttls:
+          starttls: # là https
             enable: true
           ssl:
             trust: smtp.gmail.com
+    protocol: smtp
 
 jwt:
     secret: dcnNZDycP4dGEJvBO40ibxjap207BpXKr8vwlNP2pl0=
