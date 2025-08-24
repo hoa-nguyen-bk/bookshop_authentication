@@ -1,5 +1,6 @@
 package com.cybersoft.bookshop_authentication.services.imp;
 
+import com.cybersoft.bookshop_authentication.dto.TokenDTO;
 import com.cybersoft.bookshop_authentication.dto.UserDTO;
 import com.cybersoft.bookshop_authentication.entity.Users;
 import com.cybersoft.bookshop_authentication.enumable.StatusUser;
@@ -10,13 +11,14 @@ import com.cybersoft.bookshop_authentication.services.AuthenticationServices;
 import com.cybersoft.bookshop_authentication.services.MailSenderService;
 import com.cybersoft.bookshop_authentication.utils.CommonHelper;
 import com.cybersoft.bookshop_authentication.utils.JwtHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -44,8 +46,40 @@ public class AuthenticationServicesImp implements AuthenticationServices {
         if (!passwordEncoder.matches(password, users.getPassword())) {
             throw new DataNotFound("Invalid password for user: " + email);
         }else{
-            return jwtHelper.generateToken(users.getEmail());
+            TokenDTO tokenDTO = new TokenDTO();
+            tokenDTO.setEmail(users.getEmail());
+            tokenDTO.setRoles(List.of(users.getRole().getName()));
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonData = "";
+            try {
+                jsonData = objectMapper.writeValueAsString(tokenDTO);
+            } catch (Exception e) {
+                throw new DataNotFound("Error while serializing tokenDTO", e);
+            }
+
+            // mình can thiệt token để trả ra data token có jwt nằm ở trỏng
+            return jwtHelper.generateToken(jsonData);
+
         }
+    }
+
+    @Override
+    public List<String> decodeToken(String token) {
+        // sử dụng api này chỉ để trả về danh sách token và trả ra danh sách role
+        String data = jwtHelper.validateAndGetDataToken(token);
+        if(data == null || data.isEmpty()) {
+            throw new DataNotFound("Invalid token");
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        TokenDTO tokenDTO = null;
+        try {
+            tokenDTO = objectMapper.readValue(data, TokenDTO.class);
+            return tokenDTO.getRoles();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
